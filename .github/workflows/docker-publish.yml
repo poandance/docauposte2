@@ -105,7 +105,7 @@ jobs:
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-to-prod:
-    needs: sonarcloud
+#    needs: sonarcloud
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -185,7 +185,7 @@ jobs:
         #       done
 
   build-to-dev:
-    needs: sonarcloud
+#    needs: sonarcloud
     runs-on: ubuntu-latest
     permissions:
       contents: read
