@@ -106,12 +106,12 @@
 										Aucune/Toutes
 									</option>
 									{% for uap in uaps %}
-									
-												<option
-													value="{{uap.id}}" {% if uap.id in department.uaps|map(u => u.id) %} selected
-													{% endif %}>
-													{{uap.name|upper}}
-												</option>
+
+										<option
+											value="{{uap.id}}" {% if uap.id in department.uaps|map(u => u.id) %} selected
+											{% endif %}>
+											{{uap.name|upper}}
+										</option>
 									{% endfor %}
 								</select>
 								<select
@@ -120,7 +120,7 @@
 									multiple="multiple"
 									size="3"
 									data-department-modification-target="select">
-									>
+
 									<option
 										value="0"
 										{% if department.zones is empty %} selected

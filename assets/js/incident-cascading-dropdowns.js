@@ -17,9 +17,11 @@ let incidentCategoriesData = null;
  * Fetches data from the server, initializes cascading dropdown menus,
  * resets dropdowns, and preselects dropdown values based on server data.
  */
-document.addEventListener("turbo:load", () => {
+document.addEventListener("turbo:frame-load", () => {
   getEntityData()
     .then((data) => {
+      console.log('event turbo frame load for incident cascading dropdowns', new Date().toLocaleTimeString());
+      console.log('Fetched entity data for incident cascading dropdowns:', data);
       // Assign fetched data to variables
       incidentZoneData = data.zones;
       incidentProductLinesData = data.productLines;
@@ -52,6 +54,11 @@ function initCascadingDropdowns() {
   const zoneDropdown = document.getElementById("incident_zone");
   const productLineDropdown = document.getElementById("incident_productLine");
   const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
+
+  console.log('init incident cascading dropdowns', new Date().toLocaleTimeString());
+  console.log('zoneDropdown', zoneDropdown);
+  console.log('productLineDropdown', productLineDropdown);
+  console.log('incidentCategoryDropdown', incidentCategoryDropdown);
 
   // Check if all dropdown elements are available
   if (zoneDropdown && productLineDropdown && incidentCategoryDropdown) {
@@ -113,7 +120,8 @@ function preselectDropdownValues() {
    */
   const productLineDropdown = document.getElementById("incident_productLine");
 
-  console.log('preselect dropdown stuff');
+  console.log('preselect dropdown stuff', Date.now("hh:mm:ss"));
+
   console.log('zoneIdFromServer', zoneIdFromServer);
   console.log('productLineIdFromServer', productLineIdFromServer);
   console.log('categoryIdFromServer', categoryIdFromServer);
@@ -145,64 +153,86 @@ function preselectDropdownValues() {
  * Event listener for the "turbo:load" event that sets up a click handler for creating a new incident category.
  * The function sends an AJAX POST request to create a new incident category and handles the response.
  *
- * @listens turbo:load
+ * @listens turbo:frame-load
  */
-document.addEventListener("turbo:load", function () {
-  let createIncidentCategoryButton = document.getElementById(
-    "create_incident_incidentCategory"
-  );
+document.addEventListener("turbo:frame-load", function (e) {
+  // Ne traiter que le frame concerné
+  const frame = e.target;
+  if (!frame || frame.id !== 'incident_management_view') return;
 
-  if (createIncidentCategoryButton) {
-    createIncidentCategoryButton.addEventListener("click", function (e) {
-      e.preventDefault();
+  // Cherche le bouton à l'intérieur du frame
+  const createIncidentCategoryButton = frame.querySelector("#create_incident_incidentCategory");
+  console.log('createIncidentCategoryButton', createIncidentCategoryButton);
 
-      // Get the value from the incident category name input
-      let incidentCategoryName = document
-        .getElementById("incident_incidentCategory_name")
-        .value.trim();
+  // Si le bouton n'existe pas ou si on a déjà initialisé, on sort
+  if (!createIncidentCategoryButton || createIncidentCategoryButton.dataset.incidentInit === '1') {
+    return;
+  }
 
-      let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/docauposte/incident/incident_incidentCategory_creation");
-      xhr.setRequestHeader("Content-Type", "application/json");
+  // Marque le bouton comme initialisé (sera réinitialisé à chaque reload du frame car l'élément est recréé)
+  createIncidentCategoryButton.dataset.incidentInit = '1';
 
-      xhr.onload = function () {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          // Parse the JSON response
-          let response = JSON.parse(xhr.responseText);
+  createIncidentCategoryButton.addEventListener("click", function (evt) {
+    evt.preventDefault();
 
-          // Show the message to the user
-          alert(response.message);
+    // Empêche double envoi en désactivant le bouton
+    createIncidentCategoryButton.disabled = true;
 
-          // Check if the operation was successful
-          if (response.success) {
-            // Clear the input field after successful submission
-            document.getElementById("incident_incidentCategory_name").value = "";
+    // Récupère la valeur dans le frame (pas dans le document parent)
+    const nameInput = frame.querySelector("#incident_incidentCategory_name");
+    const incidentCategoryName = nameInput ? nameInput.value.trim() : "";
 
-            // Force a reload of the page
-            location.reload();
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/docauposte/incident/incident_incidentCategory_creation");
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function () {
+      // Réactive le bouton quoi qu'il arrive
+      createIncidentCategoryButton.disabled = false;
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        let response;
+        try {
+          response = JSON.parse(xhr.responseText);
+        } catch (err) {
+          console.error('Invalid JSON response', err);
+          return;
+        }
+
+        alert(response.message || '');
+
+        if (response.success) {
+          // Clear input
+          if (nameInput) nameInput.value = "";
+
+          // Reload uniquement le turbo-frame avec cache-buster
+          const parentFrame = document.getElementById('incident_management_view');
+          if (parentFrame && parentFrame.getAttribute('src')) {
+            const srcUrl = new URL(parentFrame.getAttribute('src'), window.location.origin);
+            srcUrl.searchParams.set('_ts', Date.now());
+            parentFrame.setAttribute('src', srcUrl.toString());
+          } else if (window.Turbo) {
+            Turbo.visit(window.location.href);
           } else {
-            // Handle failure, e.g., show error message
-            console.error(response.message);
+            location.reload();
           }
         } else {
-          // Handle other HTTP errors
-          console.error("The request failed!");
+          console.error(response.message);
         }
-      };
+      } else {
+        console.error("The request failed!");
+      }
+    };
 
-      xhr.onerror = function () {
-        // Handle total failure of the request
-        console.error("The request could not be made!");
-      };
+    xhr.onerror = function () {
+      createIncidentCategoryButton.disabled = false;
+      console.error("The request could not be made!");
+    };
 
-      xhr.send(
-        JSON.stringify({
-          incident_incidentCategory_name: incidentCategoryName,
-        })
-      );
-    });
-  }
+    xhr.send(JSON.stringify({ incident_incidentCategory_name: incidentCategoryName }));
+  });
 });
+
 
 /**
  * Event listener for modifying an incident form.
@@ -220,30 +250,30 @@ if (modifyIncidentForm) {
    */
   modifyIncidentForm.addEventListener("submit", function (event) {
     event.preventDefault();
-  
+
     // Create a new FormData object
     let formData = new FormData();
-  
+
     // Get the file input element
     let fileInput = document.querySelector("#incident_file");
-  
+
     // Get the CSRF token
     let csrfTokenInput = document.querySelector("#incident__token");
     let csrfTokenValue = csrfTokenInput.value;
-  
+
     // Add the CSRF token to formData
     formData.append("incident[_token]", csrfTokenValue);
-  
+
     if (fileInput.files.length > 0) {
       // A file was selected; add it to formData
       let file = fileInput.files[0];
       formData.append("incident[file]", file);
     }
-  
+
     // Get the dropdown elements and name input
     let incidentProductLineDropdown = document.getElementById("incident_productLine");
     let nameInput = document.getElementById("incident_name");
-  
+
     // Get and append the selected values
     if (incidentProductLineDropdown) {
       let productLineValue = parseInt(
@@ -252,13 +282,13 @@ if (modifyIncidentForm) {
       );
       formData.append("incident[productLine]", productLineValue);
     }
-  
+
     // Get the name value
     let nameValue = nameInput.value;
     if (nameValue) {
       formData.append("incident[name]", nameValue);
     }
-  
+
     // Get and append auto display priority
     let autoDisplayPriority = document.getElementById("incident_autoDisplayPriority");
     if (autoDisplayPriority) {
@@ -268,7 +298,7 @@ if (modifyIncidentForm) {
       );
       formData.append("incident[autoDisplayPriority]", autoDisplayPriorityValue);
     }
-  
+
     // Get and append incident category
     let incidentCategory = document.getElementById("incident_incidentCategory");
     if (incidentCategory) {
@@ -278,11 +308,11 @@ if (modifyIncidentForm) {
       );
       formData.append("incident[incidentCategory]", incidentCategoryValue);
     }
-  
+
     // Get the action URL from the form's action attribute
     let form = document.getElementById("modifyIncidentForm");
     let actionUrl = form.getAttribute("action");
-  
+
     // Send formData to server
     fetch(actionUrl, {
       method: "POST",

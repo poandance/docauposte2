@@ -6,8 +6,12 @@ use App\Repository\IncidentCategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: IncidentCategoryRepository::class)]
+#[UniqueEntity(fields: 'name', message: 'Une catégorie avec ce nom existe déjà.')]
+
 class IncidentCategory
 {
     #[ORM\Id]
