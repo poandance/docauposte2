@@ -87,24 +87,6 @@ class IncidentController extends AbstractController
     }
 
 
-    #[Route(path: '/admin/incident/incident_list_view', name: 'incident_list_view')]
-    public function incidentListView(?array $groupIncidents = null): Response
-    {
-        if ($groupIncidents === null) {
-            $incidents = $this->entityManagerFacade->getIncidents();
-            $groupIncidents = $this->incidentService->groupIncidents(incidents: $incidents);
-        }
-
-        return $this->render(
-            view: 'services/incident/incident_list.html.twig',
-            parameters: [
-                'groupIncidents'            => $groupIncidents,
-            ]
-        );
-    }
-
-
-
 
     // Render the incidents page and filter the incidents by productLine and sort them by id ascending to display them in the right order
     /**
@@ -224,11 +206,12 @@ class IncidentController extends AbstractController
         $entity = $this->entityManagerFacade->deleteEntity($entityType, $incidentCategoryId);
 
         if ($entity) {
-            $this->addFlash('success', $entityType . ' has been deleted');
+            $this->addFlash('success', 'Le type d\'incident a été supprimé');
+            $this->logger->debug(   $entityType . ' has been deleted successfully');
             return $this->redirectToRoute('app_incident_management_view');
         } else {
-            $this->logger->error('Erreur lors de la suppression du ' . $entityType);
-            $this->addFlash('danger',  $entityType . '  does not exist');
+            $this->logger->debug('Erreur lors de la suppression du ' . $entityType);
+            $this->addFlash('danger',  'Erreur lors de la suppression du type d\'incident.');
             return $this->redirectToRoute('app_incident_management_view');
 
         }
@@ -264,14 +247,14 @@ class IncidentController extends AbstractController
                 return $this->redirectToRoute('app_incident_management_view');
 
             } catch (\Exception $e) {
-                $this->logger->error('Error during file upload', [$e->getMessage()]);
+                $this->logger->debug('Error during file upload', [$e->getMessage()]);
                 $this->addFlash('danger', 'Les documents n\'ont pas pu être chargés. Erreur : ' . $e->getMessage());
                 return $this->redirectToRoute('app_incident_management_view');
 
             }
         } else {
             // Show an error message if the form is not submitted
-            $this->logger->info('Le fichier n\'a pas été poster correctement.');
+            $this->logger->debug('Le fichier n\'a pas été poster correctement.');
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirectToRoute('app_incident_management_view');
 

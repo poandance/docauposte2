@@ -16,20 +16,24 @@
 				<strong>
 					Formulaire d'ajout d'Incident :
 				</strong>
-			</button>
-			<div
-				id="flash-messages">
-				{% for label, messages in app.flashes %}
+				<aside
+					class="ms-3">
 					<div
-						class="alert alert-{{ label }} fs-5">
-						{% for message in messages %}
-							<p>
-								{{ message }}
-							</p>
+						id="flash-messages">
+						{% for label, messages in app.flashes %}
+							<div
+								class="alert alert-{{ label }} fs-5"
+								role="alert">
+								{% for message in messages %}
+									<p>
+										{{ message }}
+									</p>
+								{% endfor %}
+							</div>
 						{% endfor %}
 					</div>
-				{% endfor %}
-			</div>
+				</aside>
+			</button>
 		</h2>
 		<div
 			id="collapseIncident"
@@ -47,19 +51,6 @@
 							<div>
 								<div
 									class="col-lg-10 col-md-12 col-sm-12 justify-content-center mx-auto">
-									<div
-										id="flash-messages">
-										{% for label, messages in app.flashes %}
-											<div
-												class="alert alert-{{ label }}">
-												{% for message in messages %}
-													<p>
-														{{ message }}
-													</p>
-												{% endfor %}
-											</div>
-										{% endfor %}
-									</div>
 									<form
 										class="col-lg-10 col-md-12 col-sm-12 mx-auto"
 										id="upload-form"
@@ -167,11 +158,6 @@
 								<div
 									class="col-lg-10 col-md-12 col-sm-12 mx-auto">
 									{% include 'services/incident/incident_list.html.twig' %}
-									{# <turbo-frame
-										id="incident_list_view"
-										src="{{ path('app_incident_list_view', { groupIncidents: groupIncidents }) }}" data-accordion-frame-manager-target="turboFrame"
-										loading="lazy">
-									</turbo-frame> #}
 								</div>
 							</div>
 						</div>

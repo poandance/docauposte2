@@ -234,11 +234,16 @@ document.addEventListener("turbo:frame-load", function (e) {
 });
 
 
+
+
+
 /**
  * Event listener for modifying an incident form.
  */
 let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
 if (modifyIncidentForm) {
+  console.log('modifyIncidentForm exist', new Date().toLocaleTimeString());
+
   /**
    * Handles the submission of the modify incident form.
    * Prevents the default form submission, gathers form data including file uploads,
@@ -250,7 +255,7 @@ if (modifyIncidentForm) {
    */
   modifyIncidentForm.addEventListener("submit", function (event) {
     event.preventDefault();
-
+    console.log('modifyIncidentForm submit', new Date().toLocaleTimeString());
     // Create a new FormData object
     let formData = new FormData();
 
