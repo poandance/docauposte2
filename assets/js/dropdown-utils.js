@@ -1,5 +1,5 @@
 // docauposte2/assets/js/dropdown-utils.js
-
+console.log('dropdown-utils.js loaded');
 /**
  * Filters data based on a key-value pair.
  * @param {Array} data - The data array to filter.

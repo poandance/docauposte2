@@ -1,4 +1,5 @@
 // docauposte2/assets/js/cascading-dropdowns.js
+console.log('cascading-dropdowns.js loaded');
 
 import { getEntityData } from './server-variable.js';
 import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';

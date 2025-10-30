@@ -1,3 +1,4 @@
+console.log("department-creation.js loaded");
 
 import { getEntityData } from './server-variable.js';
 

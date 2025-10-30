@@ -1,5 +1,5 @@
 // docauposte2/assets/js/document-validator.js
-
+console.log('document-validator.js loaded');
 import { getUserData, getSettingsData } from './server-variable.js';
 import { populateDropdown, resetDropdowns } from './dropdown-utils.js';
 

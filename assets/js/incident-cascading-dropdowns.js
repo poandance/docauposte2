@@ -1,4 +1,5 @@
 // docauposte2/assets/js/incident-cascading-dropdowns.js
+console.log('incident-cascading-dropdowns.js loaded');
 
 /* global zoneIdFromServer, productLineIdFromServer */
 

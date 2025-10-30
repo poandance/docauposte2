@@ -1,9 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class iluoSearchController extends Controller {
-    static targets = ["",
-        "",
-        ""];
+    static targets = [];
 
 
     connect() {

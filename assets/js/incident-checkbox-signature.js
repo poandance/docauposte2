@@ -1,3 +1,6 @@
+console.log('incident-checkbox-signature.js loaded');
+
+
 /**
  * Initializes event listeners for checkboxes, a text field, and a button.
  * Displays the text field when all checkboxes are checked and displays the button when the text field is not empty.

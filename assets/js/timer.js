@@ -1,3 +1,5 @@
+console.log('timer.js loaded');
+
 import axios from 'axios'; // Import axios
 
 /**

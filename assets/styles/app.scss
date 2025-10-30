@@ -737,3 +737,14 @@ iframe {
     }
 }
 
+.flash-compact {
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+  padding: .1rem .25rem !important;
+  margin: 0 .2rem .2rem 0 !important;
+  display: inline-block;
+  max-width: 18rem;
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+}

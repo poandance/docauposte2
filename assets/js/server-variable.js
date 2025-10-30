@@ -1,4 +1,5 @@
 // assets/js/server-variable.js
+console.log('server-variable.js loaded');
 
 // Variables to store promises for each API call
 let entityDataPromise = null;

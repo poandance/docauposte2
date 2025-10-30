@@ -213,10 +213,12 @@
 
 			{% include "services/uploads/upload.html.twig" %}
 
+
 			{% if is_granted('ROLE_LINE_ADMIN') %}
 				<turbo-frame
 					id="incident_management_view"
-					src="{{ path('app_incident_management_view', { parentEntityType: pageLevel, entityId: entityId }) }}" data-accordion-frame-manager-target="turboFrame">
+					src="{{ path('app_incident_management_view', { parentEntityType: pageLevel, entityId: entityId }) }}" data-accordion-frame-manager-target="turboFrame"
+					loading="lazy">
 					{{ loading.content_placeholder('text', 2, '90%') }}
 				</turbo-frame>
 			{% endif %}
