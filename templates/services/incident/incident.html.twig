@@ -22,7 +22,7 @@
 						id="flash-messages">
 						{% for label, messages in app.flashes %}
 							<div
-								class="alert alert-{{ label }} fs-5"
+								class="alert alert-{{ label }} fs-5 flash-compact"
 								role="alert">
 								{% for message in messages %}
 									<p>
@@ -151,7 +151,8 @@
 												</li>
 
 											</ul>
-										{% endfor %}r
+										{% endfor %}
+										r
 									{% endif %}
 									<hr>
 								</div>
