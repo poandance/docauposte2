@@ -10,7 +10,10 @@
 
 	{% block javascripts %}
 		{{parent()}}
-		{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+		{# <script>
+			var incidentCategoryId = {{ incidentCategoryId }};
+		</script> #}
+		{{ encore_entry_script_tags('incident-modification-cascading-dropdowns') }}
 	{% endblock %}
 	<div
 		class="card border-0 shadow rounded-3 my-5 bg-secondary">
@@ -35,8 +38,7 @@
 					class="ratio ratio-4x3">
 					<iframe
 						title="incident-file-display-for-modification"
-						src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" 
-						target="_blank"></iframe>
+						src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" target="_blank"></iframe>
 				</div>
 
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyIncidentForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_incident_modify_file', {'incidentId': incident.id})}) }}

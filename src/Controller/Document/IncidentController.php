@@ -207,13 +207,12 @@ class IncidentController extends AbstractController
 
         if ($entity) {
             $this->addFlash('success', 'Le type d\'incident a été supprimé');
-            $this->logger->debug(   $entityType . ' has been deleted successfully');
+            $this->logger->debug($entityType . ' has been deleted successfully');
             return $this->redirectToRoute('app_incident_management_view');
         } else {
             $this->logger->debug('Erreur lors de la suppression du ' . $entityType);
             $this->addFlash('danger',  'Erreur lors de la suppression du type d\'incident.');
             return $this->redirectToRoute('app_incident_management_view');
-
         }
     }
 
@@ -245,19 +244,16 @@ class IncidentController extends AbstractController
                 $name = $this->incidentService->uploadIncidentFiles($request);
                 $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
                 return $this->redirectToRoute('app_incident_management_view');
-
             } catch (\Exception $e) {
                 $this->logger->debug('Error during file upload', [$e->getMessage()]);
                 $this->addFlash('danger', 'Les documents n\'ont pas pu être chargés. Erreur : ' . $e->getMessage());
                 return $this->redirectToRoute('app_incident_management_view');
-
             }
         } else {
             // Show an error message if the form is not submitted
             $this->logger->debug('Le fichier n\'a pas été poster correctement.');
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirectToRoute('app_incident_management_view');
-
         }
     }
 
@@ -318,7 +314,6 @@ class IncidentController extends AbstractController
             $this->logger->debug('File deleted successfully', ['file' => $name]);
             $this->addFlash('success', 'Fichier ' . $name . ' supprimé');
             return $this->redirectToRoute('app_incident_management_view');
-
         } catch (\Exception $e) {
             $this->logger->debug('Error deleting file', [$e->getMessage()]);
             $this->addFlash('danger', 'Erreur lors de la suppression du fichier. Erreur: ' . $e->getMessage());
@@ -382,14 +377,15 @@ class IncidentController extends AbstractController
         // Create a form to modify the Upload entity
         $form = $this->createForm(IncidentType::class, $incident);
         $productLine = $incident->getProductLine();
+        $zone = $productLine->getZone();
+
         // If it's a GET request, render the form
         return $this->render('services/incident/incident_modification.html.twig', [
-            'form'          => $form->createView(),
-            'zone'          => $productLine->getZone(),
-            'productLine'   => $productLine,
-            'incident'      => $incident
+            'form'                      => $form->createView(),
+            'zone'                      => $zone,
+            'productLine'               => $productLine,
+            'incident'                  => $incident,
+            // 'incidentCategoryId'        => $incident->getIncidentCategory()->getId(),
         ]);
     }
-
-  
 }

@@ -18,8 +18,16 @@ let incidentCategoriesData = null;
  * Fetches data from the server, initializes cascading dropdown menus,
  * resets dropdowns, and preselects dropdown values based on server data.
  */
-document.addEventListener("turbo:frame-load", () => {
- 
+document.addEventListener("turbo:frame-load", (e) => {
+  // Only process the relevant frame
+  const frame = e.target;
+  console.log('turbo frame load event', frame);
+  // Only run this logic if the correct frame is being loaded.
+  if (!frame || frame.id !== 'incident_management_view') {
+    return;
+  }
+
+  console.log('turbo frame load for incident cascading dropdowns start', new Date().toLocaleTimeString());
   getEntityData(true)
     .then((data) => {
       console.log('event turbo frame load for incident cascading dropdowns', new Date().toLocaleTimeString());
@@ -122,6 +130,13 @@ function preselectDropdownValues() {
    */
   const productLineDropdown = document.getElementById("incident_productLine");
 
+  /**
+    * The dropdown element for selecting incident categories.
+    * @type {HTMLSelectElement}
+    */
+
+  const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
+
   console.log('preselect dropdown stuff', new Date().toLocaleTimeString());
 
   console.log('zoneIdFromServer', zoneIdFromServer);
@@ -146,6 +161,8 @@ function preselectDropdownValues() {
       textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
     });
   }
+
+
 }
 
 /**
@@ -243,98 +260,3 @@ document.addEventListener("turbo:frame-load", function (e) {
 
 
 
-
-/**
- * Event listener for modifying an incident form.
- */
-let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
-if (modifyIncidentForm) {
-  console.log('modifyIncidentForm exist', new Date().toLocaleTimeString());
-
-  /**
-   * Handles the submission of the modify incident form.
-   * Prevents the default form submission, gathers form data including file uploads,
-   * CSRF token, and selected dropdown values, and sends the data to the server via a POST request.
-   * Reloads the page upon successful submission or logs an error if the request fails.
-   *
-   * @param {Event} event - The event object representing the form submission event.
-   * @returns {void}
-   */
-  modifyIncidentForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    console.log('modifyIncidentForm submit', new Date().toLocaleTimeString());
-    // Create a new FormData object
-    let formData = new FormData();
-
-    // Get the file input element
-    let fileInput = document.querySelector("#incident_file");
-
-    // Get the CSRF token
-    let csrfTokenInput = document.querySelector("#incident__token");
-    let csrfTokenValue = csrfTokenInput.value;
-
-    // Add the CSRF token to formData
-    formData.append("incident[_token]", csrfTokenValue);
-
-    if (fileInput.files.length > 0) {
-      // A file was selected; add it to formData
-      let file = fileInput.files[0];
-      formData.append("incident[file]", file);
-    }
-
-    // Get the dropdown elements and name input
-    let incidentProductLineDropdown = document.getElementById("incident_productLine");
-    let nameInput = document.getElementById("incident_name");
-
-    // Get and append the selected values
-    if (incidentProductLineDropdown) {
-      let productLineValue = parseInt(
-        incidentProductLineDropdown.value,
-        10
-      );
-      formData.append("incident[productLine]", productLineValue);
-    }
-
-    // Get the name value
-    let nameValue = nameInput.value;
-    if (nameValue) {
-      formData.append("incident[name]", nameValue);
-    }
-
-    // Get and append auto display priority
-    let autoDisplayPriority = document.getElementById("incident_autoDisplayPriority");
-    if (autoDisplayPriority) {
-      let autoDisplayPriorityValue = parseInt(
-        autoDisplayPriority.value,
-        6  // Default value if parsing fails
-      );
-      formData.append("incident[autoDisplayPriority]", autoDisplayPriorityValue);
-    }
-
-    // Get and append incident category
-    let incidentCategory = document.getElementById("incident_incidentCategory");
-    if (incidentCategory) {
-      let incidentCategoryValue = parseInt(
-        incidentCategory.value,
-        10
-      );
-      formData.append("incident[incidentCategory]", incidentCategoryValue);
-    }
-
-    // Get the action URL from the form's action attribute
-    let form = document.getElementById("modifyIncidentForm");
-    let actionUrl = form.getAttribute("action");
-
-    // Send formData to server
-    fetch(actionUrl, {
-      method: "POST",
-      body: formData,
-    })
-      .then(() => {
-        window.location.reload(true);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  });
-}

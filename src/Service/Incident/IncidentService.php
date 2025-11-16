@@ -173,23 +173,25 @@ class IncidentService extends AbstractController
 
         // Get the new file directly from the incident object
         $newFile = $incident->getFile();
+        
+        if ($newFile) {
+            // Check if the file is of the right type
+            if ($newFile->getMimeType() != 'application/pdf') {
+                $this->logger->error('Invalid file type for incident file: ' . $incident->getName());
+                throw new \InvalidArgumentException('Le fichier doit être un pdf');
+            }
 
-        // Check if the file is of the right type
-        if ($newFile->getMimeType() != 'application/pdf') {
-            $this->logger->error('Invalid file type for incident file: ' . $incident->getName());
-            throw new \InvalidArgumentException('Le fichier doit être un pdf');
-        }
-
-        // Move the new file to the directory
-        try {
-            $newFile->move($folderPath . '/', $incident->getName());
-        } catch (\Exception $e) {
-            $this->logger->error('Failed to move file: ' . $incident->getName(), [
-                'exception' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            $this->addFlash('error', 'Erreur lors du déplacement du fichier');
-            throw $e;
+            // Move the new file to the directory
+            try {
+                $newFile->move($folderPath . '/', $incident->getName());
+            } catch (\Exception $e) {
+                $this->logger->error('Failed to move file: ' . $incident->getName(), [
+                    'exception' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                $this->addFlash('error', 'Erreur lors du déplacement du fichier');
+                throw $e;
+            }
         }
 
         // Update the uploader in the incident object
