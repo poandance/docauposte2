@@ -1,3 +1,6 @@
+console.log('inactivity-timer.js loaded');
+
+
 import { getSettingsData } from './server-variable.js';
 import { timer } from './timer.js';
 

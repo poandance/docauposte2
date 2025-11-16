@@ -184,7 +184,7 @@ class MailerController extends AbstractController
 
         foreach ($this->entityFetchingService->getUsers() as $user) {
             $username = $user->getUsername();
-            $newEmail = "florian.dkhissi+{$username}@opmobility.com";
+            $newEmail = "florian+{$username}@dkhissi.me";
  
             $oldEmail = $user->getEmailAddress();
 

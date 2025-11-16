@@ -1,3 +1,5 @@
+console.log('views-modification-value-tracker.js loaded');
+
 
 /**
  * Initializes form modification tracking and handles form submission.

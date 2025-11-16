@@ -64,7 +64,7 @@ class IncidentController extends AbstractController
      * @return Response A rendered Symfony Response object containing the incident management view
      */
     #[Route('/admin/incidentmanagementview/{parentEntityType}/{entityId}', name: 'incident_management_view')]
-    public function incidentManagementView(string $parentEntityType, ?int $entityId = null): Response
+    public function incidentManagementView(?string $parentEntityType = 'super', ?int $entityId = null): Response
     {
         $entityIdInt = (int) $entityId;
         if ($parentEntityType === 'super') {
@@ -80,11 +80,12 @@ class IncidentController extends AbstractController
         return $this->render(
             view: 'services/incident/incident.html.twig',
             parameters: [
-                'groupincidents'            => $groupIncidents,
+                'groupIncidents'            => $groupIncidents,
                 'incidentCategories'        => $incidentCategories,
             ]
         );
     }
+
 
 
     // Render the incidents page and filter the incidents by productLine and sort them by id ascending to display them in the right order
@@ -205,12 +206,13 @@ class IncidentController extends AbstractController
         $entity = $this->entityManagerFacade->deleteEntity($entityType, $incidentCategoryId);
 
         if ($entity) {
-            $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirectToOriginUrl($request);
+            $this->addFlash('success', 'Le type d\'incident a été supprimé');
+            $this->logger->debug($entityType . ' has been deleted successfully');
+            return $this->redirectToRoute('app_incident_management_view');
         } else {
-            $this->logger->error('Erreur lors de la suppression du ' . $entityType);
-            $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirectToOriginUrl($request);
+            $this->logger->debug('Erreur lors de la suppression du ' . $entityType);
+            $this->addFlash('danger',  'Erreur lors de la suppression du type d\'incident.');
+            return $this->redirectToRoute('app_incident_management_view');
         }
     }
 
@@ -241,17 +243,17 @@ class IncidentController extends AbstractController
             try {
                 $name = $this->incidentService->uploadIncidentFiles($request);
                 $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
-                return $this->redirectToOriginUrl($request);
+                return $this->redirectToRoute('app_incident_management_view');
             } catch (\Exception $e) {
-                $this->logger->error('Error during file upload', [$e->getMessage()]);
+                $this->logger->debug('Error during file upload', [$e->getMessage()]);
                 $this->addFlash('danger', 'Les documents n\'ont pas pu être chargés. Erreur : ' . $e->getMessage());
-                return $this->redirectToOriginUrl($request);
+                return $this->redirectToRoute('app_incident_management_view');
             }
         } else {
             // Show an error message if the form is not submitted
-            $this->logger->info('Le fichier n\'a pas été poster correctement.');
+            $this->logger->debug('Le fichier n\'a pas été poster correctement.');
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
-            return $this->redirectToOriginUrl($request);
+            return $this->redirectToRoute('app_incident_management_view');
         }
     }
 
@@ -309,12 +311,13 @@ class IncidentController extends AbstractController
         $this->logger->debug('Deleting file: ' . $incidentEntity->getPath());
         try {
             $name = $this->incidentService->deleteIncidentFile($incidentEntity);
-            $this->addFlash('success', 'File ' . $name . ' deleted');
-            return $this->redirectToOriginUrl(request: $request);
+            $this->logger->debug('File deleted successfully', ['file' => $name]);
+            $this->addFlash('success', 'Fichier ' . $name . ' supprimé');
+            return $this->redirectToRoute('app_incident_management_view');
         } catch (\Exception $e) {
-            $this->logger->error('Error deleting file', [$e->getMessage()]);
-            $this->addFlash('danger', 'Error deleting file. Error: ' . $e->getMessage());
-            return $this->redirectToOriginUrl(request: $request);
+            $this->logger->debug('Error deleting file', [$e->getMessage()]);
+            $this->addFlash('danger', 'Erreur lors de la suppression du fichier. Erreur: ' . $e->getMessage());
+            return $this->redirectToRoute('app_incident_management_view');
         }
     }
 
@@ -374,29 +377,15 @@ class IncidentController extends AbstractController
         // Create a form to modify the Upload entity
         $form = $this->createForm(IncidentType::class, $incident);
         $productLine = $incident->getProductLine();
+        $zone = $productLine->getZone();
+
         // If it's a GET request, render the form
         return $this->render('services/incident/incident_modification.html.twig', [
-            'form'          => $form->createView(),
-            'zone'          => $productLine->getZone(),
-            'productLine'   => $productLine,
-            'incident'      => $incident
+            'form'                      => $form->createView(),
+            'zone'                      => $zone,
+            'productLine'               => $productLine,
+            'incident'                  => $incident,
+            // 'incidentCategoryId'        => $incident->getIncidentCategory()->getId(),
         ]);
-    }
-
-    /**
-     * Redirects the user back to the page they came from.
-     *
-     * This utility method extracts the referrer URL from the request headers
-     * and creates a redirect response to that URL, effectively sending the user
-     * back to the previous page after an action is completed.
-     *
-     * @param Request $request The HTTP request object containing the referrer information
-     *
-     * @return Response A redirect response to the originating URL
-     */
-    public function redirectToOriginUrl($request): Response
-    {
-        $originUrl = $request->headers->get('referer');
-        return $this->redirect($originUrl);
     }
 }

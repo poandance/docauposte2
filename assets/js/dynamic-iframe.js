@@ -1,3 +1,5 @@
+console.log('dynamic-iframe.js loaded');
+
 import Split from 'split.js';
 
 console.log('Dynamic Iframe script loaded.');

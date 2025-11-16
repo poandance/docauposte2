@@ -5,6 +5,7 @@
 {% block javascripts %}
 	{{ parent() }}
 	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+
 	{{ encore_entry_script_tags('cascading-dropdowns') }}
 	{{ encore_entry_script_tags('document-validator') }}
 	{{ encore_entry_script_tags('department-creation') }}
@@ -212,6 +213,7 @@
 			{% endif %}
 
 			{% include "services/uploads/upload.html.twig" %}
+
 
 			{% if is_granted('ROLE_LINE_ADMIN') %}
 				<turbo-frame

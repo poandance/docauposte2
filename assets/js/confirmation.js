@@ -1,4 +1,5 @@
 // Define the confirmation handler once outside both event listeners
+console.log('confirmation.js loaded');
 /**
  * Handles the confirmation dialog for a specific action.
  * 

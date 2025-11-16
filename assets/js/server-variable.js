@@ -1,4 +1,5 @@
 // assets/js/server-variable.js
+console.log('server-variable.js loaded');
 
 // Variables to store promises for each API call
 let entityDataPromise = null;
@@ -12,8 +13,8 @@ let settingsDataPromise = null;
  *
  * @returns {Promise<Object>} A promise that resolves to the entity data object.
  */
-export function getEntityData() {
-  if (!entityDataPromise) {
+export function getEntityData(forceRefresh = false) {
+  if (forceRefresh || !entityDataPromise) {
     entityDataPromise = fetch("/docauposte/api/entity_data")
       .then((response) => response.json());
   }
@@ -50,3 +51,9 @@ export function getSettingsData() {
   return settingsDataPromise;
 }
 
+/**
+ * Resets the cached entity data promise, forcing a refetch on the next call to getEntityData.
+ */
+export function resetEntityData() {
+  entityDataPromise = null;
+}

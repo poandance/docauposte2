@@ -63,7 +63,10 @@ class IncidentType extends AbstractType
                 EntityType::class,
                 [
                     'class' => ProductLine::class,
-                    'choice_label' => 'name',
+                    'choice_label' => function (ProductLine $productLine) {
+                        $name = $productLine->getName();
+                        return strtoupper(explode('.', $name)[0]);
+                    },
                     'label' => 'Select a productLine:',
                     'placeholder' => 'Choisir un Produit',
                     'required' => true,

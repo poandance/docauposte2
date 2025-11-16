@@ -1,3 +1,6 @@
+console.log('incident-cycler.js loaded');
+
+
 import { getSettingsData } from './server-variable.js';
 import { timer } from './timer.js';
 

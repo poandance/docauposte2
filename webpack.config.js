@@ -26,6 +26,7 @@ Encore
   .addEntry("server-variable", "./assets/js/server-variable.js")
   .addEntry("cascading-dropdowns", "./assets/js/cascading-dropdowns.js")
   .addEntry("incident-cascading-dropdowns", "./assets/js/incident-cascading-dropdowns.js")
+  .addEntry("incident-modification-cascading-dropdowns", "./assets/js/incident-modification-cascading-dropdowns.js")
   .addEntry("incident-checkbox-signature", "./assets/js/incident-checkbox-signature.js")
   .addEntry("department-creation", "./assets/js/department-creation.js")
   .addEntry("document-validator", "./assets/js/document-validator.js")

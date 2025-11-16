@@ -1,3 +1,5 @@
+console.log('toast.js loaded');
+
 /**
  * Initializes and displays toast notifications on the page.
  * 

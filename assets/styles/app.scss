@@ -231,9 +231,7 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     display: block;
     font-weight: bold;
     height: 15px;
-    overflow: hidden;
     position: relative;
-    width: 25px;
     overflow: visible;
     padding-right: 10px; // Add more padding if needed
     width: auto; // Make sure the width is not constraining the content
@@ -737,3 +735,14 @@ iframe {
     }
 }
 
+.flash-compact {
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+  padding: .1rem .25rem !important;
+  margin: 0 .2rem .2rem 0 !important;
+  display: inline-block;
+  max-width: 18rem;
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+}
