@@ -4,7 +4,7 @@ console.log('incident-cascading-dropdowns.js loaded');
 /* global zoneIdFromServer, productLineIdFromServer */
 
 // Import necessary functions from other modules
-import { getEntityData } from './server-variable.js';
+import { getEntityData, resetEntityData } from './server-variable.js';
 import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
 
 // Declare variables to hold data fetched from the server
@@ -19,7 +19,8 @@ let incidentCategoriesData = null;
  * resets dropdowns, and preselects dropdown values based on server data.
  */
 document.addEventListener("turbo:frame-load", () => {
-  getEntityData()
+ 
+  getEntityData(true)
     .then((data) => {
       console.log('event turbo frame load for incident cascading dropdowns', new Date().toLocaleTimeString());
       console.log('Fetched entity data for incident cascading dropdowns:', data);
@@ -121,7 +122,7 @@ function preselectDropdownValues() {
    */
   const productLineDropdown = document.getElementById("incident_productLine");
 
-  console.log('preselect dropdown stuff', Date.now("hh:mm:ss"));
+  console.log('preselect dropdown stuff', new Date().toLocaleTimeString());
 
   console.log('zoneIdFromServer', zoneIdFromServer);
   console.log('productLineIdFromServer', productLineIdFromServer);
@@ -206,8 +207,12 @@ document.addEventListener("turbo:frame-load", function (e) {
           // Clear input
           if (nameInput) nameInput.value = "";
 
+          // Force refresh of entity data on next load
+          resetEntityData();
+
           // Reload uniquement le turbo-frame avec cache-buster
           const parentFrame = document.getElementById('incident_management_view');
+
           if (parentFrame && parentFrame.getAttribute('src')) {
             const srcUrl = new URL(parentFrame.getAttribute('src'), window.location.origin);
             srcUrl.searchParams.set('_ts', Date.now());
@@ -217,6 +222,7 @@ document.addEventListener("turbo:frame-load", function (e) {
           } else {
             location.reload();
           }
+
         } else {
           console.error(response.message);
         }
