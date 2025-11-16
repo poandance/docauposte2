@@ -10,9 +10,6 @@
 
 	{% block javascripts %}
 		{{parent()}}
-		{# <script>
-			var incidentCategoryId = {{ incidentCategoryId }};
-		</script> #}
 		{{ encore_entry_script_tags('incident-modification-cascading-dropdowns') }}
 	{% endblock %}
 	<div

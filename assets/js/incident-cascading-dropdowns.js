@@ -22,8 +22,9 @@ document.addEventListener("turbo:frame-load", (e) => {
   // Only process the relevant frame
   const frame = e.target;
   console.log('turbo frame load event', frame);
+
   // Only run this logic if the correct frame is being loaded.
-  if (!frame || frame.id !== 'incident_management_view') {
+  if (frame?.id !== 'incident_management_view') {
     return;
   }
 
@@ -32,10 +33,10 @@ document.addEventListener("turbo:frame-load", (e) => {
     .then((data) => {
       console.log('event turbo frame load for incident cascading dropdowns', new Date().toLocaleTimeString());
       console.log('Fetched entity data for incident cascading dropdowns:', data);
-      // Assign fetched data to variables
-      incidentZoneData = data.zones;
-      incidentProductLinesData = data.productLines;
-      incidentCategoriesData = data.incidentCategories;
+      // Assign fetched data to variables using optional chaining
+      incidentZoneData = data?.zones;
+      incidentProductLinesData = data?.productLines;
+      incidentCategoriesData = data?.incidentCategories;
 
       // Initialize dropdowns and reset them
       initCascadingDropdowns();
@@ -51,9 +52,6 @@ document.addEventListener("turbo:frame-load", (e) => {
     });
 });
 
-/**
- * Initializes cascading dropdown menus for zones, product lines, and incident categories.
- */
 /**
  * Initializes cascading dropdown menus for zones, product lines, and incident categories.
  *
@@ -77,21 +75,21 @@ function initCascadingDropdowns() {
       defaultText: 'Sélectionner une Zone',
     });
 
-    // Get the selected index of incidentCategoryDropdown
-    let incidentCategoryValue = parseInt(incidentCategoryDropdown.options.selectedIndex, 10);
+    // Get the selected index of incidentCategoryDropdown using optional chaining
+    let incidentCategoryValue = Number.parseInt(incidentCategoryDropdown?.options?.selectedIndex ?? 0, 10);
 
     // If no incident category is selected, populate incident category dropdown
     if (incidentCategoryValue === 0) {
       populateDropdown(incidentCategoryDropdown, incidentCategoriesData, {
         defaultText: 'Sélectionner une Catégorie d\'Incident',
-        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+        textFormatter: (text) => text?.split(".")[0]?.charAt(0)?.toUpperCase() + text?.split(".")[0]?.slice(1),
       });
     }
 
     // Event listener for when the zone dropdown value changes
     zoneDropdown.addEventListener("change", (event) => {
-      // Get the selected value from the zone dropdown
-      const selectedValue = parseInt(event.target.value);
+      // Get the selected value from the zone dropdown using optional chaining
+      const selectedValue = Number.parseInt(event.target?.value ?? 0);
 
       // Filter product lines based on selected zone
       const filteredProductLines = filterData(incidentProductLinesData, "zone_id", selectedValue);
@@ -99,7 +97,7 @@ function initCascadingDropdowns() {
       // Populate product line dropdown based on selected zone
       populateDropdown(productLineDropdown, filteredProductLines, {
         defaultText: 'Sélectionner une Ligne',
-        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+        textFormatter: (text) => text?.split(".")[0]?.charAt(0)?.toUpperCase() + text?.split(".")[0]?.slice(1),
       });
 
       // Reset dependent dropdowns
@@ -108,9 +106,6 @@ function initCascadingDropdowns() {
   }
 }
 
-/**
- * Preselects dropdown values based on data from the server.
- */
 /**
  * Preselects dropdown values based on data from the server.
  *
@@ -130,19 +125,10 @@ function preselectDropdownValues() {
    */
   const productLineDropdown = document.getElementById("incident_productLine");
 
-  /**
-    * The dropdown element for selecting incident categories.
-    * @type {HTMLSelectElement}
-    */
-
-  const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
-
   console.log('preselect dropdown stuff', new Date().toLocaleTimeString());
 
   console.log('zoneIdFromServer', zoneIdFromServer);
   console.log('productLineIdFromServer', productLineIdFromServer);
-  console.log('categoryIdFromServer', categoryIdFromServer);
-  console.log('buttonIdFromServer', buttonIdFromServer);
 
   preselectValues([
     {
@@ -154,109 +140,175 @@ function preselectDropdownValues() {
   ]);
 
   if (zoneIdFromServer && productLineDropdown) {
-    const filteredProductLines = filterData(incidentProductLinesData, "zone_id", parseInt(zoneIdFromServer));
+    const filteredProductLines = filterData(incidentProductLinesData, "zone_id", Number.parseInt(zoneIdFromServer));
     populateDropdown(productLineDropdown, filteredProductLines, {
       selectedId: productLineIdFromServer,
       defaultText: 'Choisissez d\'abord une Zone',
-      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+      textFormatter: (text) => text?.split(".")[0]?.charAt(0)?.toUpperCase() + text?.split(".")[0]?.slice(1),
     });
   }
+}
 
 
+
+
+/**
+ * Checks if the incident category button should be initialized
+ * @param {HTMLElement} frame - The turbo frame element
+ * @returns {HTMLElement|null} The button element if it should be initialized, null otherwise
+ */
+function getIncidentCategoryButton(frame) {
+  if (frame?.id !== 'incident_management_view') {
+    return null;
+  }
+
+  const button = frame.querySelector("#create_incident_incidentCategory");
+
+  if (!button || button.dataset?.incidentInit === '1') {
+    return null;
+  }
+
+  return button;
 }
 
 /**
- * Event listener for creating a new incident category.
+ * Handles the XHR response for incident category creation
+ * @param {XMLHttpRequest} xhr - The XMLHttpRequest object
+ * @param {HTMLElement} frame - The turbo frame element
+ * @param {HTMLButtonElement} button - The submit button
  */
-/**
- * Event listener for the "turbo:load" event that sets up a click handler for creating a new incident category.
- * The function sends an AJAX POST request to create a new incident category and handles the response.
- *
- * @listens turbo:frame-load
- */
-document.addEventListener("turbo:frame-load", function (e) {
-  // Ne traiter que le frame concerné
-  const frame = e.target;
-  if (!frame || frame.id !== 'incident_management_view') return;
+function handleIncidentCategoryResponse(xhr, frame, button) {
+  button.disabled = false;
 
-  // Cherche le bouton à l'intérieur du frame
-  const createIncidentCategoryButton = frame.querySelector("#create_incident_incidentCategory");
-  console.log('createIncidentCategoryButton', createIncidentCategoryButton);
-
-  // Si le bouton n'existe pas ou si on a déjà initialisé, on sort
-  if (!createIncidentCategoryButton || createIncidentCategoryButton.dataset.incidentInit === '1') {
+  if (xhr.status < 200 || xhr.status >= 300) {
+    console.error("The request failed!");
     return;
   }
 
-  // Marque le bouton comme initialisé (sera réinitialisé à chaque reload du frame car l'élément est recréé)
-  createIncidentCategoryButton.dataset.incidentInit = '1';
+  let response;
+  try {
+    response = JSON.parse(xhr.responseText);
+  } catch (err) {
+    console.error('Invalid JSON response', err);
+    return;
+  }
 
-  createIncidentCategoryButton.addEventListener("click", function (evt) {
-    evt.preventDefault();
+  alert(response?.message ?? '');
 
-    // Empêche double envoi en désactivant le bouton
-    createIncidentCategoryButton.disabled = true;
+  if (response?.success) {
+    handleSuccessfulCreation(frame);
+  } else {
+    console.error(response?.message);
+  }
+}
 
-    // Récupère la valeur dans le frame (pas dans le document parent)
-    const nameInput = frame.querySelector("#incident_incidentCategory_name");
-    const incidentCategoryName = nameInput ? nameInput.value.trim() : "";
+/**
+ * Handles successful incident category creation
+ * @param {HTMLElement} frame - The turbo frame element
+ */
+function handleSuccessfulCreation(frame) {
+  // Clear input
+  const nameInput = frame.querySelector("#incident_incidentCategory_name");
+  if (nameInput) {
+    nameInput.value = "";
+  }
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/docauposte/incident/incident_incidentCategory_creation");
-    xhr.setRequestHeader("Content-Type", "application/json");
+  // Force refresh of entity data
+  resetEntityData();
 
-    xhr.onload = function () {
-      // Réactive le bouton quoi qu'il arrive
-      createIncidentCategoryButton.disabled = false;
+  // Reload the frame
+  reloadIncidentFrame();
+}
 
-      if (xhr.status >= 200 && xhr.status < 300) {
-        let response;
-        try {
-          response = JSON.parse(xhr.responseText);
-        } catch (err) {
-          console.error('Invalid JSON response', err);
-          return;
-        }
+/**
+ * Reloads the incident management frame
+ */
+function reloadIncidentFrame() {
+  const parentFrame = document.getElementById('incident_management_view');
+  const srcUrl = parentFrame?.getAttribute('src');
 
-        alert(response.message || '');
+  if (parentFrame && srcUrl) {
+    const url = new URL(srcUrl, globalThis.location.origin);
+    url.searchParams.set('_ts', Date.now());
+    parentFrame.setAttribute('src', url.toString());
+  } else if (globalThis.Turbo) {
+    Turbo.visit(globalThis.location.href);
+  } else {
+    location.reload();
+  }
+}
 
-        if (response.success) {
-          // Clear input
-          if (nameInput) nameInput.value = "";
+/**
+ * Creates and sends XHR request for incident category creation
+ * @param {string} categoryName - The name of the incident category
+ * @param {HTMLElement} frame - The turbo frame element
+ * @param {HTMLButtonElement} button - The submit button
+ */
+function sendIncidentCategoryRequest(categoryName, frame, button) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/docauposte/incident/incident_incidentCategory_creation");
+  xhr.setRequestHeader("Content-Type", "application/json");
 
-          // Force refresh of entity data on next load
-          resetEntityData();
+  xhr.onload = () => handleIncidentCategoryResponse(xhr, frame, button);
 
-          // Reload uniquement le turbo-frame avec cache-buster
-          const parentFrame = document.getElementById('incident_management_view');
+  xhr.onerror = () => {
+    button.disabled = false;
+    console.error("The request could not be made!");
+  };
 
-          if (parentFrame && parentFrame.getAttribute('src')) {
-            const srcUrl = new URL(parentFrame.getAttribute('src'), window.location.origin);
-            srcUrl.searchParams.set('_ts', Date.now());
-            parentFrame.setAttribute('src', srcUrl.toString());
-          } else if (window.Turbo) {
-            Turbo.visit(window.location.href);
-          } else {
-            location.reload();
-          }
+  xhr.send(JSON.stringify({ incident_incidentCategory_name: categoryName }));
+}
 
-        } else {
-          console.error(response.message);
-        }
-      } else {
-        console.error("The request failed!");
-      }
-    };
+/**
+ * Handles the click event for creating a new incident category
+ * @param {Event} evt - The click event
+ * @param {HTMLElement} frame - The turbo frame element
+ * @param {HTMLButtonElement} button - The submit button
+ */
+function handleIncidentCategoryCreation(evt, frame, button) {
+  evt.preventDefault();
 
-    xhr.onerror = function () {
-      createIncidentCategoryButton.disabled = false;
-      console.error("The request could not be made!");
-    };
+  // Prevent double submission
+  button.disabled = true;
 
-    xhr.send(JSON.stringify({ incident_incidentCategory_name: incidentCategoryName }));
+  // Get and validate input
+  const incidentCategoryName = frame.querySelector("#incident_incidentCategory_name")?.value?.trim() ?? "";
+
+  if (!incidentCategoryName) {
+    button.disabled = false;
+    alert("Veuillez entrer un nom de catégorie");
+    return;
+  }
+
+  sendIncidentCategoryRequest(incidentCategoryName, frame, button);
+}
+
+/**
+ * Initializes the incident category creation button
+ * @param {HTMLElement} frame - The turbo frame element
+ */
+function initializeIncidentCategoryButton(frame) {
+  const button = getIncidentCategoryButton(frame);
+
+  if (!button) {
+    return;
+  }
+
+  // Mark button as initialized
+  button.dataset.incidentInit = '1';
+
+  // Add click event listener
+  button.addEventListener("click", (evt) => {
+    handleIncidentCategoryCreation(evt, frame, button);
   });
+
+  console.log('Incident category button initialized');
+}
+
+/**
+ * Event listener for the "turbo:frame-load" event that sets up incident category creation
+ * @listens turbo:frame-load
+ */
+document.addEventListener("turbo:frame-load", (e) => {
+  initializeIncidentCategoryButton(e.target);
 });
-
-
-
-

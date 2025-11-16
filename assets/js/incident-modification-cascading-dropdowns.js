@@ -190,7 +190,7 @@ if (modifyIncidentForm) {
             body: formData,
         })
             .then(() => {
-                window.location.reload(true);
+                globalThis.location.reload(true);
             })
             .catch((error) => {
                 console.error("Error:", error);
