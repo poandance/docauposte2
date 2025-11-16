@@ -1,5 +1,4 @@
 // docauposte2/assets/js/dropdown-utils.js
-console.log('dropdown-utils.js loaded');
 /**
  * Filters data based on a key-value pair.
  * @param {Array} data - The data array to filter.
@@ -40,7 +39,6 @@ export function populateDropdown(dropdown, data, options = {}) {
     textFormatter = null,
   } = options;
 
-  // console.log("dropdown-utils::populateDropdown - dropdown", dropdown);
   // Clear existing options
   dropdown.innerHTML = '';
 
@@ -52,18 +50,17 @@ export function populateDropdown(dropdown, data, options = {}) {
   defaultOption.hidden = true;
   defaultOption.textContent = defaultText;
 
-  // console.log("dropdown-utils::populateDropdown - defaultOption", defaultOption);
   dropdown.appendChild(defaultOption);
 
   // Populate the dropdown with data
-  data.forEach((item) => {
+  for (const item of data) {
+
     // Skip items that are in the excludeValues array
     if (excludeValues.includes(item[valueKey])) {
-      return;
+      continue;
     }
 
     const option = document.createElement('option');
-    // console.log("dropdown-utils::populateDropdown - item", item);
     option.value = item[valueKey];
 
     let text = item[nameKey] || item[usernameKey];
@@ -75,9 +72,8 @@ export function populateDropdown(dropdown, data, options = {}) {
     if (item[valueKey] === selectedId) {
       option.selected = true;
     }
-    // console.log("dropdown-utils::populateDropdown - option", option);
     dropdown.appendChild(option);
-  });
+  };
 }
 
 
@@ -91,9 +87,9 @@ export function populateDropdown(dropdown, data, options = {}) {
  * @param  {...HTMLSelectElement} dropdowns - The dropdown elements to reset.
  */
 export function resetDropdowns(...dropdowns) {
-  dropdowns.forEach((dropdown) => {
+  for (const dropdown of dropdowns) {
     if (dropdown) dropdown.selectedIndex = 0;
-  });
+  }
 }
 
 
@@ -107,11 +103,11 @@ export function resetDropdowns(...dropdowns) {
  * Each configuration is an object with `dropdown`, `data`, `id`, and `options` properties.
  */
 export function preselectValues(dropdowns) {
-  dropdowns.forEach(({ dropdown, data, id, options = {} }) => {
+  for (const { dropdown, data, id, options = {} } of dropdowns) {
     if (dropdown && data && id != null) {
       populateDropdown(dropdown, data, { ...options, selectedId: id });
     }
-  });
+  }
 }
 
 

@@ -2,8 +2,8 @@
 console.log('incident-modification-cascading-dropdowns.js loaded');
 
 // Import necessary functions from other modules
-import { getEntityData, resetEntityData } from './server-variable.js';
-import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
+import { getEntityData } from './server-variable.js';
+import { filterData, populateDropdown, resetDropdowns } from './dropdown-utils.js';
 
 document.addEventListener('DOMContentLoaded', function () {
     fetchIncidentDropdownData();
@@ -17,17 +17,16 @@ async function fetchIncidentDropdownData() {
             // Assign fetched data to variables
             const incidentZoneData = data.zones;
             const incidentProductLinesData = data.productLines;
-            const incidentCategoriesData = data.incidentCategories;
 
 
-            initIncidentCascadingDropdowns(incidentZoneData, incidentProductLinesData, incidentCategoriesData);
+            initIncidentCascadingDropdowns(incidentZoneData, incidentProductLinesData);
             resetDropdowns(
                 document.getElementById("incident_zone"),
                 document.getElementById("incident_productLine"),
             );
             // Preselect if IDs exist
             if (typeof zoneIdFromServer !== 'undefined') {
-                preselectIncidentDropdowns(incidentZoneData, incidentProductLinesData, incidentCategoriesData);
+                preselectIncidentDropdowns(incidentZoneData, incidentProductLinesData);
             }
         })
         .catch((error) => {
@@ -36,10 +35,11 @@ async function fetchIncidentDropdownData() {
 }
 
 
-function initIncidentCascadingDropdowns(incidentZoneData, incidentProductLinesData, incidentCategoriesData) {
+
+
+function initIncidentCascadingDropdowns(incidentZoneData, incidentProductLinesData,) {
     const zoneDropdown = document.getElementById("incident_zone");
     const productLineDropdown = document.getElementById("incident_productLine");
-    const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
 
     if (!zoneDropdown || !productLineDropdown) return;
 
@@ -50,7 +50,7 @@ function initIncidentCascadingDropdowns(incidentZoneData, incidentProductLinesDa
 
     // Zone change handler
     zoneDropdown.addEventListener("change", (event) => {
-        const selectedValue = parseInt(event.target.value);
+        const selectedValue = Number.parseInt(event.target.value);
         const filteredProductLines = filterData(incidentProductLinesData, "zone_id", selectedValue);
 
         populateDropdown(productLineDropdown, filteredProductLines, {
@@ -73,24 +73,17 @@ function initIncidentCascadingDropdowns(incidentZoneData, incidentProductLinesDa
         }
     });
 
-    // // Populate incident categories
-    // if (incidentCategoryDropdown) {
-    //     populateDropdown(incidentCategoryDropdown, incidentCategoriesData, {
-    //         defaultText: 'Choisir un type d\'incident',
-    //         textFormatter: (text) => text.split(".")[0].toUpperCase(),
-    //     });
-    // }
 }
 
 
-function preselectIncidentDropdowns(incidentZoneData, incidentProductLinesData, incidentCategoriesData) {
+function preselectIncidentDropdowns(incidentZoneData, incidentProductLinesData) {
     const zoneDropdown = document.getElementById("incident_zone");
     const productLineDropdown = document.getElementById("incident_productLine");
 
     if (zoneIdFromServer && zoneDropdown) {
         zoneDropdown.value = zoneIdFromServer;
 
-        const filteredProductLines = filterData(incidentProductLinesData, "zone_id", parseInt(zoneIdFromServer));
+        const filteredProductLines = filterData(incidentProductLinesData, "zone_id", Number.parseInt(zoneIdFromServer));
         populateDropdown(productLineDropdown, filteredProductLines, {
             selectedId: productLineIdFromServer,
             defaultText: 'Sélectionner une Ligne',
@@ -105,6 +98,8 @@ function preselectIncidentDropdowns(incidentZoneData, incidentProductLinesData, 
     }
 }
 
+
+
 /**
  * Event listener for modifying an incident form.
  */
@@ -113,9 +108,6 @@ if (modifyIncidentForm) {
 
     console.log('modifyIncidentForm zoneIdFromServer', zoneIdFromServer);
     console.log('modifyIncidentForm productLineIdFromServer', productLineIdFromServer);
-    console.log('modifyIncidentForm categoryIdFromServer', categoryIdFromServer);
-    console.log('modifyIncidentForm buttonIdFromServer', buttonIdFromServer);
-    // console.log('modifyIncidentForm incidentCategoryId', incidentCategoryId);
 
     /**
      * Handles the submission of the modify incident form.
@@ -155,7 +147,7 @@ if (modifyIncidentForm) {
 
         // Get and append the selected values
         if (incidentProductLineDropdown) {
-            let productLineValue = parseInt(
+            let productLineValue = Number.parseInt(
                 incidentProductLineDropdown.value,
                 10
             );
@@ -171,7 +163,7 @@ if (modifyIncidentForm) {
         // Get and append auto display priority
         let autoDisplayPriority = document.getElementById("incident_autoDisplayPriority");
         if (autoDisplayPriority) {
-            let autoDisplayPriorityValue = parseInt(
+            let autoDisplayPriorityValue = Number.parseInt(
                 autoDisplayPriority.value,
                 6  // Default value if parsing fails
             );
@@ -181,7 +173,7 @@ if (modifyIncidentForm) {
         // Get and append incident category
         let incidentCategory = document.getElementById("incident_incidentCategory");
         if (incidentCategory) {
-            let incidentCategoryValue = parseInt(
+            let incidentCategoryValue = Number.parseInt(
                 incidentCategory.value,
                 10
             );

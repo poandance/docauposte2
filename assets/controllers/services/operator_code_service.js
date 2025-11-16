@@ -1,19 +1,15 @@
 import { getSettingsData } from '../../js/server-variable';
 import axios from 'axios';
 
-// Default values
-let codeOpeRegex = /^\d{5}$/;
-let codeOpeMethodBool = false;
-
 
 /**
  * Operator Code Service - Provides methods for code generation, validation, and checking
  */
 class OperatorCodeService {
-    constructor() {
-        this.initialized = false;
-        this.initPromise = null;
-    }
+    initialized = false;
+    initPromise = null;
+    #codeOpeRegex = /^\d{5}$/;
+    #codeOpeMethodBool = false;
 
 
 
@@ -39,10 +35,10 @@ class OperatorCodeService {
     async initialize() {
         try {
             const data = await getSettingsData();
-            codeOpeMethodBool = data.operatorCodeMethod;
-            if (!codeOpeMethodBool) {
+            this.#codeOpeMethodBool = data.operatorCodeMethod;
+            if (!this.#codeOpeMethodBool) {
                 const regexPattern = data.operatorCodeRegex.replace(/^\/|\/$/g, '');
-                codeOpeRegex = new RegExp(regexPattern);
+                this.#codeOpeRegex = new RegExp(regexPattern);
             }
             this.initialized = true;
         } catch (error) {
@@ -127,12 +123,12 @@ class OperatorCodeService {
             return Promise.resolve(false);
         }
 
-        if (codeOpeMethodBool) {
+        if (this.#codeOpeMethodBool) {
             return this.validateCodeArithmetic(code);
         }
 
         try {
-            const result = codeOpeRegex.test(code);
+            const result = this.#codeOpeRegex.test(code);
             return Promise.resolve(result);
         } catch (error) {
             console.error('Error validating operator code:', error);
@@ -150,7 +146,7 @@ class OperatorCodeService {
      */
     async validateCodeArithmetic(code) {
         try {
-            if (!codeOpeRegex.test(code)) {
+            if (!this.#codeOpeRegex.test(code)) {
                 return Promise.resolve(false);
             }
 
@@ -214,7 +210,7 @@ class OperatorCodeService {
 
             attempts++;
         }
-        
+
         return code;
     }
 
@@ -246,8 +242,8 @@ class OperatorCodeService {
     async getSettings() {
         await this.ensureInitialized();
         const settings = {
-            regex: codeOpeRegex,
-            methodEnabled: codeOpeMethodBool
+            regex: this.#codeOpeRegex,
+            methodEnabled: this.#codeOpeMethodBool
         };
 
         return settings;
