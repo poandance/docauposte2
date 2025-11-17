@@ -1,76 +1,80 @@
 {% for upload in buttonKey %}
 	<ul
-		class="list-group-item d-flex justify-content-between align-items-start mb-3 shadow-lg ">
-		<a
-			href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-outline-primary order-3"
-			target="_blank">
-			{{ upload.filename|upper }}
-		</a>
-		<div
-			class="order-2 ml-auto"></div>
-		<div
-			class="order-1 col-8">
-			Mis en ligne de la Rev.
-			{{upload.revision}}
-			par:
-			<strong>
-				{% if upload.uploader is not empty %}
-					{{upload.uploader.username|capitalize|split('.')|first }}
-					{{upload.uploader.username|upper|split('.')|last }}
-				{% else %}
-					inconnu
-				{% endif %}
-			</strong>
-			| le
-			{{ upload.uploadedAt|date('d/m/Y') }}
-			<br>
-			{% set approbations = upload.validation.approbations %}
-			{% if upload.validated is same as(true) %}
-
-				{% for approbation in approbations %}
-					-
-					<strong>
-						{% set approbatorName = approbation.userapprobator.username %}
-						{{ approbatorName|capitalize|split('.')|first }}
-						{{ approbatorName|upper|split('.')|last }}
-					</strong>
-					{{ ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y')}}
-					.
-					<br>
-					{% if approbation.comment is not empty %}
-						<ul>
-							<li>
-								Commentaire:
-								{{ approbation.comment }}
-							</li>
-						</ul>
-					{% endif %}
-
-				{% endfor %}
-
-			{% else %}
+		class="list-group mb-3">
+		<li
+			class="list-group-item d-flex justify-content-between align-items-start shadow-lg">
+			<div
+				class="order-1 col-8">
+				Mis en ligne de la Rev.
+				{{upload.revision}}
+				par:
 				<strong>
-					&nbsp;Document en cours de validation
-				</strong>
-				<br>
-				{% for approbation in approbations  %}
-					-
-					<strong>
-						{% set approbatorName = approbation.userapprobator.username %}
-
-						{{ approbatorName|capitalize|split('.')|first }}
-						{{ approbatorName|upper|split('.')|last }}
-					</strong>
-					{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé le ' ~ approbation.ApprovedAt|date('d/m/Y') : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}.
-					<br>
-					{% if approbation.comment is not empty %}
-						<ul>
-							<li >{{ approbation.comment }}</li>
-						</ul>
+					{% if upload.uploader is not empty %}
+						{{upload.uploader.username|capitalize|split('.')|first }}
+						{{upload.uploader.username|upper|split('.')|last }}
+					{% else %}
+						inconnu
 					{% endif %}
-				{% endfor %}
-			{% endif %}																					
+				</strong>
+				| le
+				{{ upload.uploadedAt|date('d/m/Y') }}
+				<br>
+				{% set approbations = upload.validation.approbations %}
+				{% if upload.validated is same as(true) %}
 
-		</div>
-	</ul>
+					{% for approbation in approbations %}
+						-
+						<strong>
+							{% set approbatorName = approbation.userapprobator.username %}
+							{{ approbatorName|capitalize|split('.')|first }}
+							{{ approbatorName|upper|split('.')|last }}
+						</strong>
+						{{ ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y')}}
+						.
+						<br>
+						{% if approbation.comment is not empty %}
+							<ul>
+								<li>
+									Commentaire:
+									{{ approbation.comment }}
+								</li>
+							</ul>
+						{% endif %}
+
+					{% endfor %}
+
+				{% else %}
+					<strong>
+						&nbsp;Document en cours de validation
+					</strong>
+					<br>
+					{% for approbation in approbations  %}
+						-
+						<strong>
+							{% set approbatorName = approbation.userapprobator.username %}
+
+							{{ approbatorName|capitalize|split('.')|first }}
+							{{ approbatorName|upper|split('.')|last }}
+						</strong>
+						{{ approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé le ' ~ approbation.ApprovedAt|date('d/m/Y') : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}.
+                        <br>
+                        {% if approbation.comment is not empty %}
+                            <ul>
+                                <li>{{ approbation.comment }}</li>
+                            </ul>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}																					
+
+            </div>
+            <div class="order-2 ms-auto"></div>
+            <a
+                href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" 
+                class="btn btn-outline-primary order-3"
+                target="_blank"
+				style="max-width: 30%; word-wrap: break-word; overflow-wrap: break-word;">
+                {{ upload.filename|upper }}
+            </a>
+        </li>
+    </ul>
 {% endfor %}

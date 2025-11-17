@@ -13,7 +13,9 @@
 			id="trainingRecords-form"
 			method="post"
 			action="{{path('app_training_record_form', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}">
-			{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
+			{% if upload.validation is defined and upload.validation is not empty %}
+				{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
+			{% endif %}
 			<p
 				style="flex:1;"
 				class=" mx-2 card text-center">
@@ -76,7 +78,9 @@
 {% else %}
 
 	{% if trainingRecords is defined and trainingRecords is not empty %}
-		{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
+		{% if upload.validation is defined and upload.validation is not empty %}
+			{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
+		{% endif %}
 		<p
 			style="flex:1;"
 			class=" mx-2 mt-2 card text-center">
@@ -117,7 +121,10 @@
 		{% endfor %}
 
 	{% else %}
-		{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
+
+		{% if upload.validation is defined and upload.validation is not empty %}
+			{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
+		{% endif %}
 
 		<p
 			style="flex:1;"
