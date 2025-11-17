@@ -59,13 +59,13 @@
     <nav class="breadcrumb-nav mt-2 mb-3" aria-label="breadcrumb">
         <ol class="breadcrumb bg-dark bg-opacity-75 rounded-3 px-3 py-2 shadow-sm mb-0 d-flex flex-wrap align-items-center" style="--bs-breadcrumb-divider: '›';">
             <li class="breadcrumb-item d-flex align-items-center">
-                <a class="text-decoration-none d-inline-flex align-items-center" 
-                   style="color: #ff6b6b;" 
-                   href="javascript:void(0)" 
-                   onclick="event.preventDefault(); window.history.back();">
+                <button type="button"
+                        class="btn btn-link text-decoration-none d-inline-flex align-items-center p-0 border-0" 
+                        style="color: #ff6b6b;" 
+                        onclick="window.history.back();">
                     <i class="fa fa-arrow-circle-o-left me-2"></i>
                     <span class="fw-semibold text-uppercase">Retour</span>
-                </a>
+                </button>
             </li>	
             
             {% for item in navbar %}
@@ -96,7 +96,9 @@
                                href="{{ path('app_' ~ item.varName, params) }}"
                                style="transition: all 0.2s ease;"
                                onmouseover="this.style.color='#ffffff'; this.style.textShadow='0 0 8px rgba(255, 255, 255, 0.3)';"
-                               onmouseout="this.style.color=''; this.style.textShadow='';">
+                               onmouseout="this.style.color=''; this.style.textShadow='';"
+                               onfocus="this.style.color='#ffffff'; this.style.textShadow='0 0 8px rgba(255, 255, 255, 0.3)';"
+                               onblur="this.style.color=''; this.style.textShadow='';">
                                 {{ item.name|split('.')|first|upper }}
                             </a>
                         {% endif %}
