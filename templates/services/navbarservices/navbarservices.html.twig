@@ -1,73 +1,110 @@
 <div>
 	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 
-	{% if (button is defined) and (button is not empty) %}
+    {% if (button is defined) and (button is not empty) %}
 
-		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-		{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone', 'id': button.category.productLine.zone.id|default(null)} %}
-		{% set productLine = {'name': button.category.productLine.name, 'varName': 'productLine', 'id': button.category.productLine.id|default(null)} %}
-		{% set category = {'name': button.category.name, 'varName': 'category', 'id': button.category.id|default(null)} %}
-		{% set button = null %}
+        {% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
+	{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone', 'id': button.category.productLine.zone.id|default(null)} %}
+	{% set productLine = {'name': button.category.productLine.name, 'varName': 'productLine', 'id': button.category.productLine.id|default(null)} %}
+	{% set category = {'name': button.category.name, 'varName': 'category', 'id': button.category.id|default(null)} %}
+	{% set currentButton = button %}
+	{% set button = {'name': currentButton.name, 'varName': 'button', 'id': currentButton.id|default(null)} %}
 
-	{% elseif (category is defined) and (category is not empty) %}
+{% elseif (category is defined) and (category is not empty) %}
 
-		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-		{% set zone = {'name': category.productLine.zone.name, 'varName': 'zone', 'id': category.productLine.zone.id|default(null)} %}
-		{% set productLine = {'name': category.productLine.name, 'varName': 'productLine', 'id': category.productLine.id|default(null)} %}
-		{% set category = null %}
-		{% set button = null %}
+	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
+        {% set zone = {'name': category.productLine.zone.name, 'varName': 'zone', 'id': category.productLine.zone.id|default(null)} %}
+        {% set productLine = {'name': category.productLine.name, 'varName': 'productLine', 'id': category.productLine.id|default(null)} %}
+        {% set currentCategory = category %}
+        {% set category = {'name': currentCategory.name, 'varName': 'category', 'id': currentCategory.id|default(null)} %}
+        {% set button = null %}
 
-	{% elseif (productLine is defined) and (productLine is not empty) %}
+    {% elseif (productLine is defined) and (productLine is not empty) %}
 
-		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-		{% set zone = {'name': productLine.zone.name, 'varName': 'zone', 'id': productLine.zone.id|default(null)} %}
-		{% set productLine = null %}
-		{% set category = null %}
-		{% set button = null %}
+        {% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
+	{% set zone = {'name': productLine.zone.name, 'varName': 'zone', 'id': productLine.zone.id|default(null)} %}
+	{% set currentProductLine = productLine %}
+	{% set productLine = {'name': currentProductLine.name, 'varName': 'productLine', 'id': currentProductLine.id|default(null)} %}
+	{% set category = null %}
+	{% set button = null %}
 
-	{% elseif (zone is defined) and (zone is not empty) %}
+{% elseif (zone is defined) and (zone is not empty) %}
 
-		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-		{% set zone = null %}
-		{% set productLine = null %}
-		{% set category = null %}
-		{% set button = null %}
+	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
+        {% set currentZone = zone %}
+        {% set zone = {'name': currentZone.name, 'varName': 'zone', 'id': currentZone.id|default(null)} %}
+        {% set productLine = null %}
+        {% set category = null %}
+        {% set button = null %}
 
-	{% else %}
+    {% else %}
 
-		{% set base = null %}
-		{% set zone = null %}
-		{% set productLine = null %}
-		{% set category = null %}
-		{% set button = null %}
+        {% set base = null %}
+        {% set zone = null %}
+        {% set productLine = null %}
+        {% set category = null %}
+        {% set button = null %}
 
-	{% endif %}
+    {% endif %}
 
-	{% set navbar = [base, zone, productLine, category, button] %}
-	{% set params = {} %}
+    {% set navbar = [base, zone, productLine, category, button] %}
+    {% set params = {} %}
 
-	{% for item in navbar %}
-		{% if item is not null %}
-			{% set params = params|merge({(item.varName ~ 'Id'): item.id|default(null)}) %}
-		{% endif %}
-	{% endfor %}
-	
-	<nav class="breadcrumb-nav mt-2" aria-label="breadcrumb">
-		<ol class="breadcrumb">
-				<li class="breadcrumb-item">
-				<a class=" btn fa fa-arrow-circle-o-left" style="color:red" href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
-				Retour
-				</a>
-				</li>	
-				
-			{% for item in navbar %}
-				{% if (item is defined) and (item is not null) %}
-				<li class="breadcrumb-item">
-					<a class="btn fa" style="color:white" href="{{ path('app_' ~ item.varName, params) }}">{{ item.name|split('.')|first|upper }}
-					</a>
-				</li>	
-				{% endif %}
-			{% endfor %}
-		</ol>
-	</nav>
+    {% for item in navbar %}
+        {% if item is not null %}
+            {% set params = params|merge({(item.varName ~ 'Id'): item.id|default(null)}) %}
+        {% endif %}
+    {% endfor %}
+    
+    <nav class="breadcrumb-nav mt-2 mb-3" aria-label="breadcrumb">
+        <ol class="breadcrumb bg-dark bg-opacity-75 rounded-3 px-3 py-2 shadow-sm mb-0 d-flex flex-wrap align-items-center" style="--bs-breadcrumb-divider: '›';">
+            <li class="breadcrumb-item d-flex align-items-center">
+                <button type="button"
+                        class="btn btn-link text-decoration-none d-inline-flex align-items-center p-0 border-0" 
+                        style="color: #ff6b6b;" 
+                        onclick="window.history.back();">
+                    <i class="fa fa-arrow-circle-o-left me-2"></i>
+                    <span class="fw-semibold text-uppercase">Retour</span>
+                </button>
+            </li>	
+            
+            {% for item in navbar %}
+                {% if (item is defined) and (item is not null) %}
+                    {% set isActive = false %}
+                    {% if item.varName == 'base' and currentZone is not defined and currentProductLine is not defined and currentCategory is not defined and currentButton is not defined %}
+                        {% set isActive = true %}
+                    {% elseif item.varName == 'zone' and currentZone is defined %}
+                        {% set isActive = true %}
+                    {% elseif item.varName == 'productLine' and currentProductLine is defined %}
+                        {% set isActive = true %}
+                    {% elseif item.varName == 'category' and currentCategory is defined %}
+                        {% set isActive = true %}
+                    {% elseif item.varName == 'button' and currentButton is defined %}
+                        {% set isActive = true %}
+                    {% endif %}
+                    
+                    <li class="breadcrumb-item d-flex align-items-center {% if isActive %}active{% endif %}" 
+                        {% if isActive %}aria-current="page"{% endif %}>
+                        {% if isActive %}
+                            <span class="text-white fw-bold d-inline-flex align-items-center text-uppercase" 
+                                  style="text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);">
+                                <i class="fa fa-circle me-2" style="font-size: 0.5rem;"></i>
+                                {{ item.name|split('.')|first|upper }}
+                            </span>
+                        {% else %}
+                            <a class="text-white text-opacity-75 text-decoration-none d-inline-flex align-items-center text-uppercase" 
+                               href="{{ path('app_' ~ item.varName, params) }}"
+                               style="transition: all 0.2s ease;"
+                               onmouseover="this.style.color='#ffffff'; this.style.textShadow='0 0 8px rgba(255, 255, 255, 0.3)';"
+                               onmouseout="this.style.color=''; this.style.textShadow='';"
+                               onfocus="this.style.color='#ffffff'; this.style.textShadow='0 0 8px rgba(255, 255, 255, 0.3)';"
+                               onblur="this.style.color=''; this.style.textShadow='';">
+                                {{ item.name|split('.')|first|upper }}
+                            </a>
+                        {% endif %}
+                    </li>	
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </nav>
 </div>
