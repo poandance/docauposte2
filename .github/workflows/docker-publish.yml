@@ -111,8 +111,8 @@ jobs:
     # Will run if analyze succeeds and sonarcloud either succeeds or is skipped
     if: |
       always() &&
-      (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
-      github.repository != 'kiloutyg/docauposte2'
+      ((needs.sonarcloud.result == 'success' && github.repository == 'kiloutyg/docauposte2') || 
+       (needs.sonarcloud.result == 'skipped' && github.repository != 'kiloutyg/docauposte2'))
     permissions:
       contents: read
       packages: write
@@ -195,8 +195,8 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       always() &&
-      (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
-      github.repository != 'kiloutyg/docauposte2'
+      ((needs.sonarcloud.result == 'success' && github.repository == 'kiloutyg/docauposte2') || 
+       (needs.sonarcloud.result == 'skipped' && github.repository != 'kiloutyg/docauposte2'))
     permissions:
       contents: read
       packages: write

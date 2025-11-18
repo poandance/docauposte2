@@ -51,14 +51,14 @@
 			</h3>
 		</div>
 		<div
-			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1 max-vh-100">
 			{% if categories|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 
 					{% for category in categories %}
 						<a
-							class="btn btn-primary btn-lg m-5"
+							class="btn btn-primary btn-lg m-sm-3 m-md-4 m-lg-5 gap-3"
 							style="color:white"
 							href="{{path('app_category', {categoryId: category.id} )}}">
 							<span
