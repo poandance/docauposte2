@@ -89,24 +89,31 @@ jobs:
         with:
           category: "/language:${{matrix.language}}"
 
-#  sonarcloud:
-#    needs: analyze
-#    name: SonarQube Cloud
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v4.2.2
-#        with:
-#          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-#      - name: SonarQube Cloud Scan
-#        uses: SonarSource/sonarqube-scan-action@v4.2.1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+  sonarcloud:
+    needs: analyze
+    name: SonarQube Cloud
+    runs-on: ubuntu-latest
+    # Only run on exact repository match
+    if: github.repository == 'kiloutyg/docauposte2'
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarqube-scan-action@v4.2.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-to-prod:
-#    needs: sonarcloud
+    needs: sonarcloud
     runs-on: ubuntu-latest
+    # Will run if analyze succeeds and sonarcloud either succeeds or is skipped
+    if: |
+      always() &&
+      needs.analyze.result == 'success' &&
+      (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
+      github.repository == 'kiloutyg/docauposte2'
     permissions:
       contents: read
       packages: write
@@ -184,10 +191,14 @@ jobs:
         #         cosign sign --yes $tag@$DIGEST
         #       done
 
-        
   build-to-dev:
-#    needs: sonarcloud
+    needs: sonarcloud
     runs-on: ubuntu-latest
+    if: |
+      always() &&
+      needs.analyze.result == 'success' &&
+      (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
+      github.repository == 'kiloutyg/docauposte2'
     permissions:
       contents: read
       packages: write
