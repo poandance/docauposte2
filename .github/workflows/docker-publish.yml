@@ -112,7 +112,7 @@ jobs:
     if: |
       always() &&
       (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
-      github.repository == 'kiloutyg/docauposte2'
+      github.repository != 'kiloutyg/docauposte2'
     permissions:
       contents: read
       packages: write
@@ -196,7 +196,7 @@ jobs:
     if: |
       always() &&
       (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
-      github.repository == 'kiloutyg/docauposte2'
+      github.repository != 'kiloutyg/docauposte2'
     permissions:
       contents: read
       packages: write
