@@ -831,6 +831,7 @@ class ValidationService extends AbstractController
         \DateTime $today,
         ?array $nonValidatedValidations = []
     ): array {
+        $uploadsWaitingValidationRaw = [];
         foreach ($nonValidatedValidations as $validation) {
             $uploadedAt = $validation->getUpload()->getUploadedAt();
             if (date_diff($today, $uploadedAt)->days >= 14) {
